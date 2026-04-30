@@ -12,13 +12,30 @@ export default function Home() {
     if (!text) return;
     setLoading(true);
     try {
-      const res = await fetch("http://127.0.0.1:8000/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text })
-      });
-      const data = await res.json();
-      setResult(data);
+const handleScan = async () => {
+  if (!message) return;
+  setLoading(true);
+
+  try {
+    // PASTE YOUR NEW CODE HERE 👇
+    const response = await fetch('https://spam-shield-backend.onrender.com/analyze', { 
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text: message }),
+    });
+    // PASTE ENDS HERE 👆
+
+    const data = await response.json();
+    setResult(data);
+  } catch (error) {
+    console.error("Analysis failed", error);
+    alert("Backend not responding. It might be 'waking up'—wait 30 seconds and try again!");
+  } finally {
+    setLoading(false);
+  }
+};
     } catch (err) {
       alert("Backend not running! Make sure to start your Python terminal.");
     }
