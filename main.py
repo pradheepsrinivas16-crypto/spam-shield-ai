@@ -1,4 +1,21 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware  # <--- Add this import
+import joblib
+# ... other imports ...
+
+app = FastAPI()
+
+# ADD THIS BLOCK RIGHT HERE:
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows your Vercel site to talk to Render
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ... rest of your code (@app.post("/analyze"), etc.)
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import joblib
