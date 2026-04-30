@@ -4,53 +4,37 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldAlert, ShieldCheck, Send } from 'lucide-react';
 
 export default function Home() {
-  const [text, setText] = useState(""); // This is where the user's typing lives
+  const [text, setText] = useState(""); 
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  // This is the ONLY function we need for the button
   const handleScan = async () => {
     if (!text) return; 
     setLoading(true);
     setResult(null);
 
     try {
+      console.log("Sending request to Render...");
       const response = await fetch('https://spam-shield-backend.onrender.com/analyze', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text }), // We send 'text' to the brain
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: text }), 
       });
 
-      if (!response.ok) throw new Error("Backend connection failed");
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}`);
+      }
 
       const data = await response.json();
       setResult(data);
     } catch (error) {
-      console.error("Error:", error);
-      alert("The AI brain is waking up! Please wait 30 seconds and try one more time.");
+      console.error("The error was:", error);
+      alert("Wake-up call sent! Render takes 50 seconds to start. Wait 1 minute and click Scan again.");
     } finally {
       setLoading(false);
     }
-  };
-
-  return (
-    // ... keep your existing return (HTML/Tailwind) code here ...
-    // Just make sure your button has: onClick={handleScan}
-  );
-}
-    const data = await response.json();
-    setResult(data);
-  } catch (error) {
-    console.error("Analysis failed", error);
-    alert("Backend not responding. It might be 'waking up'—wait 30 seconds and try again!");
-  } finally {
-    setLoading(false);
-  }
-};
-    } catch (err) {
-      alert("Backend not running! Make sure to start your Python terminal.");
-    }
-    setLoading(false);
   };
 
   return (
@@ -73,7 +57,7 @@ export default function Home() {
           />
           <div className="p-4 border-t border-slate-800 flex justify-end">
             <button 
-              onClick={analyze}
+              onClick={handleScan} // FIXED: Changed from 'analyze' to 'handleScan'
               disabled={loading}
               className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 px-6 py-2 rounded-xl font-bold flex items-center gap-2 transition-all"
             >
