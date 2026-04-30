@@ -8,24 +8,31 @@ export default function Home() {
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  const analyze = async () => {
-    if (!text) return;
-    setLoading(true);
-    try {
 const handleScan = async () => {
-  if (!message) return;
-  setLoading(true);
+    if (!text) return; // Use 'text' because that is your state name on line 7
+    setLoading(true);
+    setResult(null);
 
-  try {
-    // PASTE YOUR NEW CODE HERE 👇
-    const response = await fetch('https://spam-shield-backend.onrender.com/analyze', { 
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ text: message }),
-    });
-    // PASTE ENDS HERE 👆
+    try {
+      const response = await fetch('https://spam-shield-backend.onrender.com/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: text }), // Sending the 'text' state
+      });
+
+      if (!response.ok) throw new Error("Backend not responding");
+
+      const data = await response.json();
+      setResult(data);
+    } catch (error) {
+      console.error("Analysis failed", error);
+      alert("Backend is waking up! Please wait 30 seconds and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
     const data = await response.json();
     setResult(data);
