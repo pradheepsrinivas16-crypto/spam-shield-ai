@@ -4,36 +4,40 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldAlert, ShieldCheck, Send } from 'lucide-react';
 
 export default function Home() {
-  const [text, setText] = useState("");
+  const [text, setText] = useState(""); // This is where the user's typing lives
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-const handleScan = async () => {
-    if (!text) return; // Use 'text' because that is your state name on line 7
+  // This is the ONLY function we need for the button
+  const handleScan = async () => {
+    if (!text) return; 
     setLoading(true);
     setResult(null);
 
     try {
       const response = await fetch('https://spam-shield-backend.onrender.com/analyze', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text: text }), // Sending the 'text' state
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text }), // We send 'text' to the brain
       });
 
-      if (!response.ok) throw new Error("Backend not responding");
+      if (!response.ok) throw new Error("Backend connection failed");
 
       const data = await response.json();
       setResult(data);
     } catch (error) {
-      console.error("Analysis failed", error);
-      alert("Backend is waking up! Please wait 30 seconds and try again.");
+      console.error("Error:", error);
+      alert("The AI brain is waking up! Please wait 30 seconds and try one more time.");
     } finally {
       setLoading(false);
     }
   };
 
+  return (
+    // ... keep your existing return (HTML/Tailwind) code here ...
+    // Just make sure your button has: onClick={handleScan}
+  );
+}
     const data = await response.json();
     setResult(data);
   } catch (error) {
