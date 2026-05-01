@@ -6,6 +6,7 @@ import { ShieldAlert, ShieldCheck, Send } from 'lucide-react';
 export default function Home() {
   const [text, setText] = useState(""); 
   const [result, setResult] = useState<any>(null);
+  const [history, setHistory] = useState<{text: string, result: string, date: string}[]>([]);
   const [loading, setLoading] = useState(false);
 
   const handleScan = async () => {

@@ -1,49 +1,35 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware  # <--- Add this import
-import joblib
-# ... other imports ...
-
-app = FastAPI()
-
-# ADD THIS BLOCK RIGHT HERE:
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allows your Vercel site to talk to Render
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# ... rest of your code (@app.post("/analyze"), etc.)
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import joblib
+import os
 
 app = FastAPI()
 
-# THIS IS THE CRITICAL "CONNECTION" PIECE
+# 1. THE CONNECTION (CORS)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, you'd put your website URL here
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-vectorizer = joblib.load('data/vectorizer.pkl')
-model = joblib.load('data/model.pkl')
-
+# 2. LOAD THE BRAIN (Corrected Paths)
+# We use 'backend/' because that is where the files are now
+# In backend/main.py
+vectorizer = joblib.load('backend/vectorizer.pkl')
+model = joblib.load('backend/model.pkl')
 class SMS(BaseModel):
     text: str
 
 @app.post("/analyze")
 def analyze_sms(sms: SMS):
-    # 1. Math Prediction
+    # Perform math prediction
     matrix = vectorizer.transform([sms.text])
     prediction = model.predict(matrix)[0]
     
-    # 2. Logic to explain WHY
+    # Logic to explain WHY
     reasons = []
     text_lower = sms.text.lower()
     
@@ -56,8 +42,8 @@ def analyze_sms(sms: SMS):
     if "$" in text_lower or "cash" in text_lower:
         reasons.append("Unverified Financial Offer")
 
-    # 3. THE FIX: If we found a reason, force the label to SPAM
-    if reasons or prediction == 1:
+    # Final Decision
+    if reasons or prediction == 'spam':
         label = "SPAM"
         explanation = " | ".join(reasons) if reasons else "Pattern matches typical spam behavior."
     else:
